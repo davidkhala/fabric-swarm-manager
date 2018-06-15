@@ -1,0 +1,4 @@
+/configtx/*
+/ca-crypto-config/
+.idea
+/node_modules
