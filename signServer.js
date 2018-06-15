@@ -1,17 +1,17 @@
 const config = require('./config');
-const logger = require('../../common/nodejs/logger').new('sign server');
+const logger = require('./common/nodejs/logger').new('sign server');
 const fsExtra = require('fs-extra');
-const userUtil = require('../../common/nodejs/user');
-const signUtil = require('../../common/nodejs/multiSign');
-const clientUtil = require('../../common/nodejs/client');
-const {CryptoPath, homeResolve} = require('../../common/nodejs/path');
+const userUtil = require('./common/nodejs/user');
+const signUtil = require('./common/nodejs/multiSign');
+const clientUtil = require('./common/nodejs/client');
+const {CryptoPath, homeResolve} = require('./common/nodejs/path');
 
 const {sha2_256} = require('fabric-client/lib/hash');
 
 const fs = require('fs');
 exports.run = () => {
 	const {port} = config.signServer;
-	const {app} = require('../../common/nodejs/baseApp').run(port);
+	const {app} = require('./common/nodejs/baseApp').run(port);
 	const Multer = require('multer');
 	const cache = Multer({dest: homeResolve(config.signServer.cache)});
 	/**
