@@ -6,12 +6,13 @@ const signUtil = require('./common/nodejs/multiSign');
 const clientUtil = require('./common/nodejs/client');
 const {CryptoPath, homeResolve} = require('./common/nodejs/path');
 
-const {sha2_256} = require('fabric-client/lib/hash');
+const baseApp = require('./common/nodejs/baseApp');
+const {sha2_256} = require('./common/nodejs/helper');
 
 const fs = require('fs');
 exports.run = () => {
 	const {port} = config.signServer;
-	const {app} = require('./common/nodejs/baseApp').run(port);
+	const {app} = baseApp.run(port);
 	const Multer = require('multer');
 	const cache = Multer({dest: homeResolve(config.signServer.cache)});
 	/**
