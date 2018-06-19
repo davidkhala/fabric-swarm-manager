@@ -23,7 +23,7 @@ exports.run = () => {
 		const ordererName = 'orderer0';
 		const peerName = 'newContainer';
 		try {
-			if (!req.file) throw 'no attachment file';
+			if (!req.file) throw Error('no attachment file');
 			const proto = fs.readFileSync(req.file.path);
 			logger.info('sign request', 'hash', sha2_256(proto));
 
