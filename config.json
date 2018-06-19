@@ -1,6 +1,6 @@
 {
-  "MSPROOT": "Documents/delphi-fabric/cluster/managerNode/ca-crypto-config",
-  "CONFIGTX": "Documents/delphi-fabric/cluster/managerNode/configtx",
+  "MSPROOT": "Documents/fabric-swarm-manager/ca-crypto-config",
+  "CONFIGTX": "Documents/fabric-swarm-manager/configtx",
   "BLOCK_FILE": "tk.block",
   "swarmServer": {
     "port": 4001,
