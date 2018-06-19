@@ -8,8 +8,8 @@
   },
   "signServer": {
     "port": 4002,
-    "cache": "Documents/delphi-fabric/cluster/managerNode/cache/",
-    "path": "Documents/delphi-fabric/cluster/managerNode/signServerPM2.js"
+    "cache": "Documents/fabric-swarm-manager/cache/",
+    "path": "Documents/fabric-swarm-manager/signServerPM2.js"
   },
   "orderer": {
     "orgs": {
