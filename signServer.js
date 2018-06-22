@@ -6,7 +6,7 @@ const signUtil = require('./common/nodejs/multiSign');
 const clientUtil = require('./common/nodejs/client');
 const {CryptoPath, homeResolve} = require('./common/nodejs/path');
 
-const baseApp = require('./common/nodejs/baseApp');
+const baseApp = require('./common/nodejs/express/baseApp');
 const {sha2_256} = require('./common/nodejs/helper');
 
 const fs = require('fs');

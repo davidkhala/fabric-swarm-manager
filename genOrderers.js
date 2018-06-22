@@ -50,6 +50,12 @@ const asyncTask = async (action) => {
 		user: {name: 'Admin'}
 	});
 
+	await newOrg(hostCryptoPath, cryptoType, undefined, ordererOrg);
+
+	const respNewOrderer = await newOrderer(hostCryptoPath.ordererHostName);
+	logger.debug({respNewOrderer});
+
+
 	const ordererService = await deployOrderer({
 		Name,
 		imageTag, network, port,
@@ -63,10 +69,7 @@ const asyncTask = async (action) => {
 	});
 
 	await taskLiveWaiter(ordererService);
-	await newOrg(hostCryptoPath, cryptoType, undefined, ordererOrg);
 
-	const respNewOrderer = await newOrderer(hostCryptoPath.ordererHostName);
-	logger.debug({respNewOrderer});
 
 };
 try {

@@ -1,25 +1,28 @@
 const config = require('./config');
 const swarmBaseUrl = `${config.swarmServer.url}:${config.swarmServer.port}`;
-const Request = require('request');
-const logger = require('./common/nodejs/logger').new('api caller');
+const {RequestPromise} = require('./common/nodejs/express/serverClient');
+const logger = require('./common/nodejs/logger').new('swarm Client');
 const serverClient = require('./common/nodejs/express/serverClient');
-const {errHandler} = serverClient;
 const {ConfigFactory} = require('./common/nodejs/configtxlator');
-exports.globalConfig = () => new Promise((resolve, reject) => {
-	Request.get(`${swarmBaseUrl}/config/orgs`, errHandler(resolve, reject, true));
-});
-exports.touch = () => new Promise((resolve, reject) => {
-	Request.get(swarmBaseUrl, errHandler(resolve, reject));
-});
+exports.globalConfig = () => {
+	return RequestPromise({url: `${swarmBaseUrl}/config/orgs`, method: 'GET'});
+};
+exports.touch = () => {
+	return RequestPromise({url: swarmBaseUrl, method: 'GET'});
+};
 exports.leader = () => serverClient.leader.info(swarmBaseUrl);
 
-exports.block = (filePath) => serverClient.block(swarmBaseUrl, filePath);
-exports.newOrg = async (cryptoPath, nodeType, channelName, orgName,TLS) => {
+exports.block = (filePath) => {
+	logger.debug('block', filePath);
+	return serverClient.block(swarmBaseUrl, filePath);
+};
+exports.newOrg = async (cryptoPath, nodeType, channelName, orgName, TLS) => {
+	logger.debug('newOrg',nodeType,{channelName,orgName,TLS},cryptoPath);
 	let orgConfig;
 	const {msp} = cryptoPath.OrgFile(nodeType);
 	const admins = [msp.admincerts];
 	const root_certs = [msp.cacerts];
-	const tls_root_certs = TLS?[msp.tlscacerts]:[];
+	const tls_root_certs = TLS ? [msp.tlscacerts] : [];
 
 	if (nodeType === 'orderer') {
 		orgConfig = config.orderer.orgs[orgName];
@@ -30,14 +33,14 @@ exports.newOrg = async (cryptoPath, nodeType, channelName, orgName,TLS) => {
 	const MSPName = orgConfig.MSP.name;
 
 	const blockWaiter = async () => {
-		const respNewOrg = await serverClient.newOrg(swarmBaseUrl, channelName, MSPID, MSPName, nodeType, {
+		const respNewOrg = await serverClient.createOrUpdateOrg(swarmBaseUrl, channelName, MSPID, MSPName, nodeType, {
 			admins,
 			root_certs,
 			tls_root_certs
-		});
+		}, false);
 		const newConfig = new ConfigFactory(respNewOrg);
 		const mspConfig = newConfig.getOrg(MSPName, nodeType);
-		logger.debug('/newOrg', mspConfig);
+		logger.debug('newOrg', mspConfig);
 		if (!mspConfig) {
 			return new Promise((resolve) => {
 				logger.warn('new org block waiter for 2 second');
@@ -49,15 +52,12 @@ exports.newOrg = async (cryptoPath, nodeType, channelName, orgName,TLS) => {
 
 	};
 	await blockWaiter();
-
 };
 exports.newOrderer = (ordererHostName) => {
 	const address = `${ordererHostName}:7050`;
-
-	return new Promise((resolve, reject) => {
-		const form = {
-			address
-		};
-		Request.post({url: `${swarmBaseUrl}/channel/newOrderer`, form}, errHandler(resolve, reject));
-	});
+	logger.debug('newOrderer',address);
+	const body = {
+		address
+	};
+	return RequestPromise({url: `${swarmBaseUrl}/channel/newOrderer`, body});
 };
