@@ -11,13 +11,20 @@ exports.touch = () => {
 	return RequestPromise({url: swarmBaseUrl, method: 'GET'});
 };
 exports.leader = () => serverClient.leader.info(swarmBaseUrl);
-
+const util = require('util');
+const exec = util.promisify(require('child_process').exec);
+exports.getChaincode =async (path) => {
+	const {stdout, stderr} = await exec('docker system prune --force');
+	if (stderr) {
+		throw stderr;
+	}
+};
 exports.block = (filePath) => {
 	logger.debug('block', filePath);
 	return serverClient.block(swarmBaseUrl, filePath);
 };
 exports.newOrg = async (cryptoPath, nodeType, channelName, orgName, TLS) => {
-	logger.debug('newOrg',nodeType,{channelName,orgName,TLS},cryptoPath);
+	logger.debug('newOrg', nodeType, {channelName, orgName, TLS}, cryptoPath);
 	let orgConfig;
 	const {msp} = cryptoPath.OrgFile(nodeType);
 	const admins = [msp.admincerts];
@@ -55,7 +62,7 @@ exports.newOrg = async (cryptoPath, nodeType, channelName, orgName, TLS) => {
 };
 exports.newOrderer = (ordererHostName) => {
 	const address = `${ordererHostName}:7050`;
-	logger.debug('newOrderer',address);
+	logger.debug('newOrderer', address);
 	const body = {
 		address
 	};
