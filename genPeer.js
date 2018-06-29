@@ -78,8 +78,8 @@ const asyncTask = async (action) => {
 	const {caCert: cert} = TLS ? hostCryptoPath.TLSFile(cryptoType) : {};
 	const peer = peerUtil.new({peerPort, peerHostName, cert});
 	const eventHub = eventHubUtil.new(peerClient, {eventHubPort, cert, peerHostName});
-	const Orderer = ordererUtil.new({ordererPort: 8050});//FIXME Testing with tls disabled, we cannot join channel without orderer pem
-	await joinChannel(channel, peer, eventHub, Orderer);
+	const orderer = ordererUtil.new({ordererPort: 7050});//FIXME Testing with tls disabled, we cannot join channel without orderer pem
+	await joinChannel(channel, peer, eventHub, orderer);
 };
 try {
 	asyncTask(process.env.action);

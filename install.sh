@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -e
+set -e -x
 CURRENT=$(cd $(dirname ${BASH_SOURCE}) && pwd)
 root=$CURRENT
 
@@ -9,6 +9,7 @@ if [ -z "$(ls -A $root/common)" ]; then
 fi
 
 $root/common/install.sh
+$root/common/install.sh chaincodeDevEnv
 
 # finally
 sudo apt autoremove -y
