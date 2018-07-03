@@ -4,11 +4,11 @@ const {swarmLeave, swarmBelongs} = require('./common/docker/nodejs/dockerode-uti
 const dockerCmdUtil = require('./common/docker/nodejs/dockerCmd');
 const arch = 'x86_64';
 const logger = require('./common/nodejs/logger').new('swarmSync');
-const role = process.env.role?process.env.role: 'manager';
+const role = process.env.role ? process.env.role : 'manager';
 const asyncTask = async (action) => {
 	await swarmClient.touch();
-	const {workerToken,managerToken} = await swarmClient.leader();
-	const token = role==='manager'?managerToken:workerToken
+	const {workerToken, managerToken} = await swarmClient.leader();
+	const token = role === 'manager' ? managerToken : workerToken;
 	const {token: JoinToken, AdvertiseAddr} = await dockerCmdUtil.advertiseAddr(token);
 
 
@@ -28,8 +28,8 @@ const asyncTask = async (action) => {
 	const {docker: {network, thirdPartyTag, fabricTag}, TLS} = await swarmClient.globalConfig();
 	await fabricImagePull({fabricTag, thirdPartyTag, arch});
 	await swarmIPJoin({AdvertiseAddr, JoinToken});
-	const node = await dockerCmdUtil.swarmWorkerInfo();
-	logger.info('this node', JSON.stringify(node));
+	const swarm = await dockerCmdUtil.swarmWorkerInfo();
+	logger.info('this node', JSON.stringify(swarm));
 
 
 };
