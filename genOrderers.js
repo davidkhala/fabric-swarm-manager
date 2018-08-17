@@ -18,7 +18,6 @@ const asyncTask = async (action) => {
 		const serviceName = swarmServiceName(Name);
 		await serviceClear(serviceName);
 
-		await volumeRemove(MSPROOTvolumeName);
 		await volumeRemove(CONFIGTXvolumeName);
 		logger.info('[done] down');
 		return;
@@ -26,12 +25,11 @@ const asyncTask = async (action) => {
 	const CONFIGTXdir = homeResolve(config.CONFIGTX);
 	const MSPROOTDir = homeResolve(config.MSPROOT);
 
-	await volumeCreateIfNotExist({Name: MSPROOTvolumeName, path: MSPROOTDir});
 	await volumeCreateIfNotExist({Name: CONFIGTXvolumeName, path: CONFIGTXdir});
 	const blockFilePath = path.resolve(CONFIGTXdir, config.BLOCK_FILE);
 	await block(blockFilePath);
 	const {docker: {network, fabricTag}, TLS} = await globalConfig();
-	const imageTag = `x86_64-${fabricTag}`;
+	const imageTag = `${fabricTag}`;
 
 	const id = config.orderer.orgs[ordererOrg].MSP.id;
 	const cryptoPath = new CryptoPath(peerUtil.container.MSPROOT, {

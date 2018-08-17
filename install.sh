@@ -1,16 +1,21 @@
 #!/usr/bin/env bash
-set -e -x
+set -e
 CURRENT=$(cd $(dirname ${BASH_SOURCE}) && pwd)
-root=$CURRENT
 
-if [ -z "$(ls -A $root/common)" ]; then
+function gitSync(){
 	git pull
 	git submodule update --init --recursive
+}
+function dockerGrant(){
+	$CURRENT/common/docker/dockerSUDO.sh
+}
+fcn=$1
+if [ -n "$fcn" ];then
+	$fcn
+else
+	$CURRENT/common/install.sh golang1_10
+	$CURRENT/common/install.sh
+	npm install
+	dockerGrant
 fi
 
-$root/common/install.sh
-$root/common/install.sh chaincodeDevEnv
-
-# finally
-sudo apt autoremove -y
-npm install

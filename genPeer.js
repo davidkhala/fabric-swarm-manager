@@ -1,6 +1,6 @@
 const config = require('./config');
 const {deployPeer, chaincodeClean} = require('./common/nodejs/fabric-dockerode');
-const {swarmServiceName, serviceClear, taskLiveWaiter} = require('./common/docker/nodejs/dockerode-util');
+const {swarmServiceName, serviceClear, taskLiveWaiter,swarmTouch} = require('./common/docker/nodejs/dockerode-util');
 const {CryptoPath, homeResolve} = require('./common/nodejs/path');
 const peerUtil = require('./common/nodejs/peer');
 const {adminName, loadFromLocal} = require('./common/nodejs/user');
@@ -10,7 +10,6 @@ const logger = require('./common/nodejs/logger').new('genPeer');
 const {newOrg} = require('./swarmClient');
 const channelUtil = require('./common/nodejs/channel');
 const clientUtil = require('./common/nodejs/client');
-const eventHubUtil = require('./common/nodejs/eventHub');
 const MSPROOTvolumeName = 'MSPROOT';
 const peerName = 'newContainer';
 const peerOrg = 'NEW';
@@ -42,7 +41,10 @@ const asyncTask = async (action) => {
 	const {peerHostName} = cryptoPath;
 	if (action === 'down') {
 		const serviceName = swarmServiceName(peerHostName);
-		await serviceClear(serviceName);
+		const {result} = await swarmTouch();
+		if(result){
+			await serviceClear(serviceName);
+		}
 		await chaincodeClean();
 		logger.info('[done] down');
 		return;
@@ -51,7 +53,7 @@ const asyncTask = async (action) => {
 	await newOrg(hostCryptoPath, cryptoType, channelName, peerOrg);
 
 	const {docker: {network, fabricTag}, TLS} = await globalConfig();
-	const imageTag = `x86_64-${fabricTag}`;
+	const imageTag = `${fabricTag}`;
 
 	//Stateful: use volume created in  genOrderer
 	const tls = TLS ? cryptoPath.TLSFile(cryptoType) : undefined;
@@ -77,9 +79,9 @@ const asyncTask = async (action) => {
 	const channel = channelUtil.new(peerClient, channelName);
 	const {caCert: cert} = TLS ? hostCryptoPath.TLSFile(cryptoType) : {};
 	const peer = peerUtil.new({peerPort, peerHostName, cert});
-	const eventHub = eventHubUtil.new(peerClient, {eventHubPort, cert, peerHostName});
 	const orderer = ordererUtil.new({ordererPort: 7050});//FIXME Testing with tls disabled, we cannot join channel without orderer pem
-	await joinChannel(channel, peer, eventHub, orderer);
+
+	await joinChannel(channel, peer,orderer,1000);
 };
 try {
 	asyncTask(process.env.action);

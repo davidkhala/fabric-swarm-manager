@@ -4,8 +4,8 @@ const chaincodeId = process.env.name ? process.env.name : 'adminChaincode';
 const channelName = 'allchannel';
 const config = require('./config');
 const logger = require('./common/nodejs/logger').new('deployCC');
-const {port, eventHubPort} = config.orgs[peerOrg].peers[peerName].portMap;
-const {updateInstall, install, invoke} = require('./common/nodejs/chaincode');
+const {port} = config.orgs[peerOrg].peers[peerName].portMap;
+const {install, invoke} = require('./common/nodejs/chaincode');
 const peerUtil = require('./common/nodejs/peer');
 const {adminName, loadFromLocal} = require('./common/nodejs/user');
 const {getChaincode, globalConfig} = require('./swarmClient');
@@ -15,6 +15,7 @@ const channelUtil = require('./common/nodejs/channel');
 const eventHubUtil = require('./common/nodejs/eventHub');
 const {chaincodeClean} = require('./common/nodejs/fabric-dockerode');
 const ordererUtil = require('./common/nodejs/orderer');
+const golangUtil = require('./common/nodejs/golang');
 const asyncTask = async (action) => {
 	if (action === 'down') {
 		await chaincodeClean(true);
@@ -39,22 +40,18 @@ const asyncTask = async (action) => {
 	const peerAdmin = await loadFromLocal(hostCryptoPath, 'peer', config.orgs[peerOrg].MSP.id, peerClient.getCryptoSuite());
 	await peerClient.setUserContext(peerAdmin, true);
 
-	if (action === 'update') {
-		await updateInstall(peer, {chaincodeId, chaincodePath}, peerClient);
-	} else {
-		await install([peer], {chaincodeId, chaincodePath, chaincodeVersion: 'v0'}, peerClient);
-	}
+	await golangUtil.setGOPATH();
+	await install([peer], {chaincodeId, chaincodePath, chaincodeVersion: 'v0'}, peerClient);
 
-	logger.debug({GOPATH: process.env.GOPATH});
 
 	const channel = channelUtil.new(peerClient, channelName);
 	const peers = [peer];
-	const eventHub = eventHubUtil.new(peerClient, {eventHubPort, cert, peerHostName});
+	const eventHub = eventHubUtil.newEventHub(channel, peer, true);
 	const eventHubs = [eventHub];
 	const fcn = '';
 	const args = [];
 	const orderer = ordererUtil.new({ordererPort: 7050});//FIXME Testing with tls disabled, we cannot join channel without orderer pem
-	await invoke(channel, peers, eventHubs, {chaincodeId, fcn, args},orderer);
+	await invoke(channel, peers, eventHubs, {chaincodeId, fcn, args}, orderer);
 };
 try {
 	asyncTask(process.env.action);

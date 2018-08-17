@@ -1,10 +1,9 @@
 const config = require('./config');
 const logger = require('./common/nodejs/logger').new('sign server');
-const fsExtra = require('fs-extra');
 const userUtil = require('./common/nodejs/user');
 const signUtil = require('./common/nodejs/multiSign');
 const clientUtil = require('./common/nodejs/client');
-const {CryptoPath, homeResolve} = require('./common/nodejs/path');
+const {CryptoPath, homeResolve,fsExtra} = require('./common/nodejs/path');
 
 const baseApp = require('./common/nodejs/express/baseApp');
 const {sha2_256} = require('./common/nodejs/helper');
