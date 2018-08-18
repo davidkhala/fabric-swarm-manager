@@ -5,22 +5,22 @@ const ordererName = 'orderer0';
 const fs = require('fs');
 const logger = require('./common/nodejs/logger').new('caCryptogen');
 const caCryptoGen = require('./common/nodejs/ca-crypto-gen');
-const {CryptoPath, homeResolve} = require('./common/nodejs/path');
+const {CryptoPath, homeResolve, fsExtra} = require('./common/nodejs/path');
 const cryptoRoot = homeResolve(config.MSPROOT);
-const dockerUtil = require('./common/docker/nodejs/dockerode-util');
+const MSPROOTvolumeName = 'MSPROOT';
+const {swarmServiceName, inflateContainerName, volumeCreateIfNotExist, volumeRemove} = require('./common/docker/nodejs/dockerode-util');
 const dockerCmd = require('./common/docker/nodejs/dockerCmd');
 const caUtil = require('./common/nodejs/ca');
 const peerOrg = 'NEW';
 const peerName = 'newContainer';
 const {globalConfig} = require('./swarmClient');
-const fsExtra = require('fs-extra');
 const {PM2} = require('./common/nodejs/express/pm2Manager');
 const signServer = require('./signServer');
 const getCaService = async (url, domain, TLS) => {
 	if (TLS) {
 		const caHostName = `ca.${domain}`;
-		const serviceName = dockerUtil.swarmServiceName(caHostName);
-		const container_name = await dockerUtil.inflateContainerName(serviceName);
+		const serviceName = swarmServiceName(caHostName);
+		const container_name = await inflateContainerName(serviceName);
 		if (!container_name) throw `service ${serviceName} not assigned to current node`;
 		const from = caUtil.container.caCert;
 		const to = `${caHostName}-cert.pem`;
@@ -41,6 +41,7 @@ const asyncTask = async (action) => {
 		await pm2.delete({name: signServerProcessName});
 		pm2.disconnect();
 		signServer.clean();
+		await volumeRemove(MSPROOTvolumeName);
 		logger.info('[done] down');
 		return;
 	}
@@ -81,6 +82,7 @@ const asyncTask = async (action) => {
 	await pm2.connect();
 	await pm2.run({name: signServerProcessName, script});
 	pm2.disconnect();
+	await volumeCreateIfNotExist({Name: MSPROOTvolumeName, path: cryptoRoot});
 };
 
 try {

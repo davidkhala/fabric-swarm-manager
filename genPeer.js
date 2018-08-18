@@ -29,7 +29,8 @@ const asyncTask = async (action) => {
 			name: adminName
 		}
 	});
-	const hostCryptoPath = new CryptoPath(homeResolve(config.MSPROOT), {
+	const MSPROOTDir = homeResolve(config.MSPROOT);
+	const hostCryptoPath = new CryptoPath(MSPROOTDir, {
 		peer: {
 			name: peerName,
 			org: peerOrg
@@ -55,7 +56,7 @@ const asyncTask = async (action) => {
 	const {docker: {network, fabricTag}, TLS} = await globalConfig();
 	const imageTag = `${fabricTag}`;
 
-	//Stateful: use volume created in  genOrderer
+	//Stateful: assume volume created in caCryptogen.js
 	const tls = TLS ? cryptoPath.TLSFile(cryptoType) : undefined;
 	const peerPort = portMap.port;
 	const eventHubPort = portMap.eventHubPort;
@@ -81,7 +82,8 @@ const asyncTask = async (action) => {
 	const peer = peerUtil.new({peerPort, peerHostName, cert});
 	const orderer = ordererUtil.new({ordererPort: 7050});//FIXME Testing with tls disabled, we cannot join channel without orderer pem
 
-	await joinChannel(channel, peer,orderer,1000);
+	const result = await joinChannel(channel, peer,orderer,1000);
+	logger.info('joinChannel',result);
 };
 try {
 	asyncTask(process.env.action);
