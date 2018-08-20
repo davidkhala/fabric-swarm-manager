@@ -10,6 +10,9 @@ An implement of setup scripts for new fabric-swarm participant
  
     `./install.sh`
 
-# Bootstrap
- 0. `./manager.sh down|up`
+# Bootstrap manager
+ - `./manager.sh`
+ 
+# Configuration
+ - see `./config.json`
   

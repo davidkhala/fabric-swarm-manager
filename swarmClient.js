@@ -47,7 +47,7 @@ exports.newOrg = async (cryptoPath, nodeType, channelName, orgName, TLS) => {
 	}, false);
 	logger.debug({respNewOrg});
 	if (respNewOrg.status === 'BAD_REQUEST') {
-		throw Error(respNewOrg);
+		throw Error(JSON.stringify(respNewOrg));
 	}
 	if (nodeType === 'orderer') {
 		const blockWaiter = async () => {
