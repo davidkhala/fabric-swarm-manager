@@ -1,6 +1,6 @@
 const peerName = 'newContainer';
 const peerOrg = 'NEW';
-const chaincodeId = process.env.name ? process.env.name : 'adminChaincode';
+const chaincodeId = process.env.name ? process.env.name : 'stress';
 const config = require('./config');
 const logger = require('./common/nodejs/logger').new('deployCC');
 const {port} = config.orgs[peerOrg].peers[peerName].portMap;
