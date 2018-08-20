@@ -9,13 +9,14 @@ const {invoke} = require('./common/nodejs/chaincode');
 const peerUtil = require('./common/nodejs/peer');
 const {adminName, loadFromLocal} = require('./common/nodejs/user');
 const {globalConfig} = require('./swarmClient');
-const {CryptoPath, homeResolve} = require('./common/nodejs/path');
+const {CryptoPath} = require('./common/nodejs/path');
 const clientUtil = require('./common/nodejs/client');
 const channelUtil = require('./common/nodejs/channel');
 const eventHubUtil = require('./common/nodejs/eventHub');
 const ordererUtil = require('./common/nodejs/orderer');
+const path = require('path');
 const asyncTask = async (action) => {
-	const hostCryptoPath = new CryptoPath(homeResolve(config.MSPROOT), {
+	const hostCryptoPath = new CryptoPath(path.resolve(config.MSPROOT), {
 		peer: {
 			name: peerName,
 			org: peerOrg

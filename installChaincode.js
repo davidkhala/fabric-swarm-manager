@@ -8,17 +8,18 @@ const {install} = require('./common/nodejs/chaincode');
 const peerUtil = require('./common/nodejs/peer');
 const {adminName, loadFromLocal} = require('./common/nodejs/user');
 const {getChaincode, globalConfig} = require('./swarmClient');
-const {CryptoPath, homeResolve} = require('./common/nodejs/path');
+const {CryptoPath} = require('./common/nodejs/path');
 const clientUtil = require('./common/nodejs/client');
 const {chaincodeClean} = require('./common/nodejs/fabric-dockerode');
 const golangUtil = require('./common/nodejs/golang');
+const path = require('path');
 const asyncTask = async (action) => {
 	if (action === 'down') {
 		await chaincodeClean(true);
 		return;
 	}
 	const {chaincodePath} = await getChaincode(chaincodeId);
-	const hostCryptoPath = new CryptoPath(homeResolve(config.MSPROOT), {
+	const hostCryptoPath = new CryptoPath(path.resolve(config.MSPROOT), {
 		peer: {
 			name: peerName,
 			org: peerOrg

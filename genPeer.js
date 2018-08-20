@@ -1,7 +1,7 @@
 const config = require('./config');
 const {deployPeer, chaincodeClean} = require('./common/nodejs/fabric-dockerode');
 const {swarmServiceName, serviceClear, taskLiveWaiter,swarmTouch} = require('./common/docker/nodejs/dockerode-util');
-const {CryptoPath, homeResolve} = require('./common/nodejs/path');
+const {CryptoPath} = require('./common/nodejs/path');
 const peerUtil = require('./common/nodejs/peer');
 const {adminName, loadFromLocal} = require('./common/nodejs/user');
 const {globalConfig} = require('./swarmClient');
@@ -15,6 +15,7 @@ const peerName = 'newContainer';
 const peerOrg = 'NEW';
 const portMap = config.orgs[peerOrg].peers[peerName].portMap;
 const ordererUtil = require('./common/nodejs/orderer');
+const path = require('path');
 const asyncTask = async (action) => {
 	logger.debug('[start] genPeer');
 	const cryptoType = 'peer';
@@ -29,7 +30,7 @@ const asyncTask = async (action) => {
 			name: adminName
 		}
 	});
-	const MSPROOTDir = homeResolve(config.MSPROOT);
+	const MSPROOTDir = path.resolve(config.MSPROOT);
 	const hostCryptoPath = new CryptoPath(MSPROOTDir, {
 		peer: {
 			name: peerName,

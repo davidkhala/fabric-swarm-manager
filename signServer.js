@@ -3,8 +3,8 @@ const logger = require('./common/nodejs/logger').new('sign server');
 const userUtil = require('./common/nodejs/user');
 const signUtil = require('./common/nodejs/multiSign');
 const clientUtil = require('./common/nodejs/client');
-const {CryptoPath, homeResolve,fsExtra} = require('./common/nodejs/path');
-
+const {CryptoPath, fsExtra} = require('./common/nodejs/path');
+const path = require('path');
 const baseApp = require('./common/nodejs/express/baseApp');
 const {sha2_256} = require('./common/nodejs/helper');
 
@@ -13,7 +13,7 @@ exports.run = () => {
 	const {port} = config.signServer;
 	const {app} = baseApp.run(port);
 	const Multer = require('multer');
-	const cache = Multer({dest: homeResolve(config.signServer.cache)});
+	const cache = Multer({dest: path.resolve(config.signServer.cache)});
 	/**
 	 * return two signatures: 1 from orderer 1 from peer
 	 */
@@ -27,7 +27,7 @@ exports.run = () => {
 			const proto = fs.readFileSync(req.file.path);
 			logger.info('sign request', 'hash', sha2_256(proto));
 
-			const cryptoPath = new CryptoPath(homeResolve(config.MSPROOT), {
+			const cryptoPath = new CryptoPath(path.resolve(config.MSPROOT), {
 				orderer: {name: ordererName, org: ordererOrg,},
 				peer: {name: peerName, org: peerOrg},
 				user: {name: 'Admin'}
@@ -51,5 +51,5 @@ exports.run = () => {
 };
 exports.clean = () => {
 	logger.info('clean');
-	fsExtra.removeSync(homeResolve(config.signServer.cache));
+	fsExtra.removeSync(path.resolve(config.signServer.cache));
 };

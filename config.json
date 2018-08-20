@@ -1,15 +1,15 @@
 {
-  "MSPROOT": "Documents/fabric-swarm-manager/ca-crypto-config",
-  "CONFIGTX": "Documents/fabric-swarm-manager/configtx",
-  "BLOCK_FILE": "tk.block",
+  "MSPROOT": "ca-crypto-config/",
+  "CONFIGTX": "configtx/",
+  "BLOCK_FILE": "all.block",
   "swarmServer": {
     "port": 4001,
-    "url": "http://192.168.0.158"
+    "url": "http://10.6.72.87"
   },
   "signServer": {
     "port": 4002,
-    "cache": "Documents/fabric-swarm-manager/cache/",
-    "path": "Documents/fabric-swarm-manager/signServerPM2.js"
+    "cache": "cache/",
+    "path": "signServerPM2.js"
   },
   "orderer": {
     "orgs": {

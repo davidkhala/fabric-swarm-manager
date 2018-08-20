@@ -5,8 +5,9 @@ const ordererName = 'orderer0';
 const fs = require('fs');
 const logger = require('./common/nodejs/logger').new('caCryptogen');
 const caCryptoGen = require('./common/nodejs/ca-crypto-gen');
-const {CryptoPath, homeResolve, fsExtra} = require('./common/nodejs/path');
-const cryptoRoot = homeResolve(config.MSPROOT);
+const {CryptoPath, fsExtra} = require('./common/nodejs/path');
+const path = require('path');
+const cryptoRoot = path.resolve(config.MSPROOT);
 const MSPROOTvolumeName = 'MSPROOT';
 const {swarmServiceName, inflateContainerName, volumeCreateIfNotExist, volumeRemove} = require('./common/docker/nodejs/dockerode-util');
 const dockerCmd = require('./common/docker/nodejs/dockerCmd');
@@ -78,7 +79,7 @@ const asyncTask = async (action) => {
 	}
 
 
-	const script = homeResolve(config.signServer.path);
+	const script = path.resolve(config.signServer.path);
 	await pm2.connect();
 	await pm2.run({name: signServerProcessName, script});
 	pm2.disconnect();

@@ -6,7 +6,7 @@ const ordererOrg = 'NewConsensus';
 const ordererName = 'orderer0';
 const MSPROOTvolumeName = 'MSPROOT';
 const CONFIGTXvolumeName = 'CONFIGTX';
-const {CryptoPath, homeResolve} = require('./common/nodejs/path');
+const {CryptoPath} = require('./common/nodejs/path');
 const peerUtil = require('./common/nodejs/peer');
 const port = config.orderer.orgs[ordererOrg].orderers[ordererName].portHost;
 const {globalConfig, block, newOrg, newOrderer} = require('./swarmClient');
@@ -22,8 +22,8 @@ const asyncTask = async (action) => {
 		logger.info('[done] down');
 		return;
 	}
-	const CONFIGTXdir = homeResolve(config.CONFIGTX);
-	const MSPROOTDir = homeResolve(config.MSPROOT);
+	const CONFIGTXdir = path.resolve(config.CONFIGTX);
+	const MSPROOTDir = path.resolve(config.MSPROOT);
 
 	await volumeCreateIfNotExist({Name: CONFIGTXvolumeName, path: CONFIGTXdir});
 	const blockFilePath = path.resolve(CONFIGTXdir, config.BLOCK_FILE);
